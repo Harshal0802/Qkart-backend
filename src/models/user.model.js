@@ -8,13 +8,25 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Name is required"],
       trim: true,
     },
     email: {
+      type: String, 
+      required: [true, "Email is required"],
+      trim: true,
+      lowercase: true,
+      unique: true,
+      validate: (newValue) => {
+        if (validator.isEmail(newValue)) return true;
+        return false;
+      }
     },
     password: {
       type: String,
+      required: [true, "Password is required"],
+      trim: true,
+      minLength: 8,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
@@ -23,11 +35,14 @@ const userSchema = mongoose.Schema(
         }
       },
     },
-    walletMoney: {
-    },
     address: {
       type: String,
       default: config.default_address,
+    },
+    walletMoney: {
+      type: Number,
+      required: true,
+      default: config.default_wallet_money,
     },
   },
   // Create createdAt and updatedAt fields automatically
@@ -42,7 +57,10 @@ const userSchema = mongoose.Schema(
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
  */
+
 userSchema.statics.isEmailTaken = async function (email) {
+      const emailCount = await mongoose.models.Users.countDocuments({ email });
+      return emailCount;
 };
 
 
@@ -56,3 +74,7 @@ userSchema.statics.isEmailTaken = async function (email) {
 /**
  * @typedef User
  */
+
+const User = mongoose.model("Users", userSchema );
+
+module.exports = User;
