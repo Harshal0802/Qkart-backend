@@ -18,8 +18,10 @@ const userSchema = mongoose.Schema(
       lowercase: true,
       unique: true,
       validate: (newValue) => {
-        if (validator.isEmail(newValue)) return true;
-        return false;
+        if
+          (validator.isEmail(newValue))
+          return true;
+          return false;
       }
     },
     password: {
