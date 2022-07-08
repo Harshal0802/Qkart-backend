@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
 const config = require("../config/config");
+const bcrypt = require("bcryptjs");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
@@ -12,23 +13,23 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     email: {
-      type: String, 
+      type: String,
       required: [true, "Email is required"],
       trim: true,
       lowercase: true,
       unique: true,
       validate: (newValue) => {
-        if
-          (validator.isEmail(newValue))
-          return true;
-          return false;
-      }
+        if (validator.isEmail(newValue)) return true;
+        return false;
+      },
     },
     password: {
       type: String,
       required: [true, "Password is required"],
       trim: true,
       minLength: 8,
+      required: true,
+      trim: true,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
@@ -61,11 +62,18 @@ const userSchema = mongoose.Schema(
  */
 
 userSchema.statics.isEmailTaken = async function (email) {
-      const emailCount = await mongoose.models.Users.countDocuments({ email });
-      return emailCount;
+  const user = await this.findOne({ email });
+  return !!user;
 };
-
-
+/**
+ * Check if entered password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
@@ -77,6 +85,6 @@ userSchema.statics.isEmailTaken = async function (email) {
  * @typedef User
  */
 
-const User = mongoose.model("Users", userSchema );
+const User = mongoose.model("Users", userSchema);
 
-module.exports = User;
+module.exports = { User };

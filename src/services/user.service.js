@@ -3,8 +3,6 @@ const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcryptjs");
 
-
-
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserById(id)
 /**
  * Get User by id
@@ -12,12 +10,13 @@ const bcrypt = require("bcryptjs");
  * @param {String} id
  * @returns {Promise<User>}
  */
- const getUserById = async (id) => {
-     const user = await User.findOne(id);
-     const { name, _id, email, walletMoney } = user;
-    return {name, _id, email, walletMoney};
-}
+const getUserById = async (id) => {
+  const user = await User.findById(id);
+  const { name, _id, email, walletMoney } = user;
+  return { name, _id, email, walletMoney };
+};
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
+
 /**
  * Get user by email
  * - Fetch user object from Mongo using the "email" field and return user object
@@ -26,9 +25,9 @@ const bcrypt = require("bcryptjs");
  */
 
 const getUserByEmail = async (email) => {
-    const user = await User.findOne(email);
-    return user;
-}
+  const user = await User.findOne({ email });
+  return user;
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
 /**
@@ -52,16 +51,14 @@ const getUserByEmail = async (email) => {
  *
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
-const createUser = async (user) => {
-    // const { name, email, password } = user;
-    if(User.isEmailTaken(user.email)){
-        throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-    } else {
-        const newUser = await User.create(user);
-        return newUser;
-    }
-}
+const createUser = async (userBody) => {
+  if (await User.isEmailTaken(userBody.email)) {
+    throw new ApiError(httpStatus.OK, "Email already taken");
+  }
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(userBody.password, salt);
+  const user = await User.create({ ...userBody, password: hashedPassword });
+  return user;
+};
 
-
-module.exports = {getUserById, getUserByEmail, createUser}
-
+module.exports = { getUserById, getUserByEmail, createUser };
