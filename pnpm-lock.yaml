@@ -22,7 +22,7 @@ specifiers:
   express: ^4.17.1
   faker: ^5.1.0
   helmet: ^4.1.0
-  http-status: ^1.5.2
+  http-status: ^1.4.0
   jest: ^22.4.4
   joi: ^17.3.0
   jsonwebtoken: ^8.5.1

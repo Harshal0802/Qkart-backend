@@ -5,6 +5,7 @@ const config = require("../config/config");
 const bcrypt = require("bcryptjs");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -65,17 +66,21 @@ userSchema.statics.isEmailTaken = async function (email) {
   const user = await this.findOne({ email });
   return !!user;
 };
+
 /**
  * Check if entered password matches the user's password
  * @param {string} password
  * @returns {Promise<boolean>}
  */
+
 userSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
   return bcrypt.compare(password, user.password);
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
+
+
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"
  * Note: The model should be accessible in a different module when imported like below
