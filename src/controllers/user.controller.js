@@ -6,6 +6,7 @@ const { User } = require("../models");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUser() function
 // TODO: CRIO_TASK_MODULE_CART - Update function to process url with query params
+
 /**
  * Get user details
  *  - Use service layer to get User data
